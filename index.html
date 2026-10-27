@@ -1,30 +1,640 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="ru">
 <head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <meta name="theme-color" content="#101827">
-  <meta name="description" content="MyWebSite — мой уголок в интернете. Скоро здесь появится больше интересного.">
-  <title>MyWebSite — мой уголок в интернете</title>
-  <style>
-    :root { color-scheme: dark; font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; background: #101827; color: #f4f7fb; }
-    * { box-sizing: border-box; }
-    body { min-height: 100vh; margin: 0; display: grid; place-items: center; padding: 28px; background: radial-gradient(ellipse at 50% 0%, #263b5d 0, #101827 56%); }
-    main { width: min(100%, 760px); padding: clamp(32px, 8vw, 76px); border: 1px solid #ffffff1c; border-radius: 28px; background: #ffffff08; box-shadow: 0 24px 80px #0004; }
-    .tag { display: inline-flex; align-items: center; gap: 9px; color: #a9bbd4; font-size: .82rem; letter-spacing: .12em; text-transform: uppercase; }
-    .dot { width: 8px; height: 8px; border-radius: 50%; background: #79e2bb; box-shadow: 0 0 14px #79e2bb99; }
-    h1 { margin: 26px 0 18px; font-size: clamp(2.7rem, 9vw, 5.5rem); line-height: .98; letter-spacing: -.065em; }
-    h1 span { color: #91b8ff; }
-    p { max-width: 540px; color: #bdc8d8; font-size: clamp(1.05rem, 2.6vw, 1.25rem); line-height: 1.75; }
-    .note { margin-top: 38px; padding-top: 22px; border-top: 1px solid #ffffff1c; color: #8291a7; font-size: .9rem; }
-  </style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Когнитивный Нейропаспорт — Английский</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #0f172a;
+            color: #f8fafc;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            margin: 0;
+            padding: 20px;
+            box-sizing: border-box;
+        }
+        .app-card {
+            background: #1e293b;
+            padding: 30px;
+            border-radius: 20px;
+            box-shadow: 0 15px 35px rgba(0,0,0,0.5);
+            max-width: 600px;
+            width: 100%;
+            text-align: center;
+            border: 1px solid #334155;
+        }
+        h1 { color: #38bdf8; font-size: 24px; margin-top: 0; }
+        p { color: #94a3b8; line-height: 1.5; font-size: 14px; }
+        .btn {
+            background: linear-gradient(135deg, #0284c7 0%, #0369a1 100%);
+            color: white; border: none; padding: 12px 24px;
+            font-size: 15px; border-radius: 10px; cursor: pointer;
+            font-weight: bold; box-shadow: 0 4px 12px rgba(2, 132, 199, 0.3);
+            transition: all 0.2s; margin-top: 15px;
+        }
+        .btn:hover { transform: translateY(-2px); }
+        .btn:disabled { opacity: 0.4; cursor: not-allowed; transform: none; }
+
+        /* Тест Шульте */
+        .schulte-grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 8px; margin: 20px 0; }
+        .schulte-cell {
+            aspect-ratio: 1; background: #334155; border: 1px solid #475569;
+            border-radius: 8px; display: flex; align-items: center; justify-content: center;
+            font-size: 18px; font-weight: bold; cursor: pointer; user-select: none;
+            transition: background 0.1s;
+        }
+        .schulte-cell:hover { background: #3f4d63; }
+        .schulte-cell.done { background: #0369a1; color: #0f172a; pointer-events: none; }
+
+        /* Струп */
+        .stroop-word { font-size: 38px; font-weight: 800; margin: 25px 0; transition: color 0.1s; }
+        .stroop-options { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+        .stroop-btn {
+            padding: 12px; font-size: 15px; font-weight: bold; border-radius: 8px;
+            border: 2px solid #475569; background: #334155; color: white; cursor: pointer;
+            transition: background 0.15s;
+        }
+        .stroop-btn:hover { background: #3f4d63; }
+
+        /* Корси */
+        .corsi-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 15px; margin: 20px auto; max-width: 300px; }
+        .corsi-block {
+            aspect-ratio: 1; background: #475569; border-radius: 8px; cursor: pointer;
+            transition: background 0.2s, box-shadow 0.2s;
+        }
+        .corsi-block.user-correct { background: #22c55e !important; box-shadow: 0 0 15px #22c55e; }
+        .corsi-block.user-wrong { background: #ef4444 !important; box-shadow: 0 0 15px #ef4444; }
+
+        /* Digit Span */
+        .digit-display { font-size: 36px; font-weight: bold; color: #38bdf8; margin: 20px 0; letter-spacing: 5px; }
+        .digit-input {
+            background: #334155; border: 2px solid #475569; border-radius: 8px; color: white;
+            font-size: 22px; padding: 10px; text-align: center; width: 80%;
+            max-width: 250px; margin-bottom: 15px; outline: none;
+        }
+        .digit-input:focus { border-color: #38bdf8; }
+
+        /* Go/No-Go */
+        .gonogo-zone { height: 150px; display: flex; align-items: center; justify-content: center; margin: 20px 0; }
+        .gonogo-circle {
+            width: 100px; height: 100px; border-radius: 50%; display: none;
+            box-shadow: 0 0 30px currentColor;
+        }
+
+        /* Хронотип */
+        .survey-options { display: flex; flex-direction: column; gap: 10px; text-align: left; margin: 20px 0; }
+        .survey-label {
+            background: #334155; padding: 12px; border-radius: 8px; cursor: pointer;
+            border: 1px solid #475569; display: flex; align-items: center; gap: 10px; font-size: 14px;
+        }
+        .survey-label:hover { background: #3f4d63; }
+
+        /* Финал */
+        .scan-animation {
+            width: 120px; height: 120px; margin: 20px auto;
+            border: 4px solid #38bdf8; border-radius: 50%;
+            border-top-color: transparent; animation: spin 1s linear infinite;
+        }
+        @keyframes spin { to { transform: rotate(360deg); } }
+        .final-layout { display: flex; flex-direction: column; align-items: center; gap: 15px; width: 100%; }
+        
+        .arrow-down { font-size: 24px; color: #38bdf8; animation: bounce 1s infinite alternate; }
+        @keyframes bounce { from { transform: translateY(0); } to { transform: translateY(5px); } }
+        
+        /* Обертка графика и фона */
+        .chart-wrapper {
+            width: 100%; max-width: 400px; margin: 0 auto; background: #111827;
+            padding: 15px; border-radius: 12px; border: 1px solid #334155;
+            box-shadow: 0 0 25px rgba(56, 189, 248, 0.35);
+            animation: pulseGlow 2.5s ease-in-out infinite alternate;
+            position: relative; 
+            overflow: hidden; 
+        }
+        @keyframes pulseGlow {
+            from { box-shadow: 0 0 15px rgba(56, 189, 248, 0.25); }
+            to   { box-shadow: 0 0 35px rgba(56, 189, 248, 0.55); }
+        }
+
+        /* Фоновый мозг */
+        .brain-bg {
+            position: absolute;
+            top: 50%; left: 50%;
+            transform: translate(-50%, -50%);
+            width: 85%; 
+            opacity: 0.15; /* Прозрачность, чтобы не перебивать график */
+            filter: drop-shadow(0 0 15px #38bdf8); /* Неоновое свечение */
+            z-index: 0;
+            pointer-events: none; 
+        }
+        
+        #neuroChart {
+            position: relative;
+            z-index: 1;
+        }
+
+        /* Кнопки-чипсы */
+        .chart-tabs { display: flex; flex-wrap: wrap; gap: 8px; justify-content: center; margin-top: 10px; z-index: 2; position: relative; width: 100%;}
+        .chart-tab {
+            background: #334155; border: 1px solid #475569; color: #94a3b8;
+            padding: 6px 10px; border-radius: 20px; font-size: 11px; cursor: pointer;
+            transition: all 0.2s;
+        }
+        .chart-tab:hover { background: #475569; color: white; }
+        .chart-tab.active { background: #0284c7; color: white; border-color: #38bdf8; }
+
+        .tips-box {
+            text-align: left; background: #0f172a; padding: 15px; border-radius: 10px;
+            border-left: 4px solid #38bdf8; font-size: 13px; line-height: 1.5;
+            min-height: 80px; width: 100%; box-sizing: border-box;
+        }
+
+        /* Научный отчет */
+        .science-report {
+            width: 100%; text-align: left; background: #111827; padding: 20px;
+            border-radius: 12px; border: 1px solid #334155; margin-top: 15px; box-sizing: border-box;
+        }
+        .science-report h3 { color: #38bdf8; font-size: 16px; margin-top: 0; margin-bottom: 10px; border-bottom: 1px solid #334155; padding-bottom: 8px;}
+        .report-stat { font-size: 13px; margin-bottom: 10px; color: #cbd5e1; }
+        .report-stat span { color: #38bdf8; font-weight: bold; }
+        .report-block { background: #1e293b; padding: 12px; border-radius: 8px; margin-bottom: 10px; font-size: 13px;}
+        .report-block.weak { border-left: 3px solid #ef4444; }
+        .report-block.strong { border-left: 3px solid #22c55e; }
+        .report-block strong { display: block; margin-bottom: 5px; color: white; }
+    </style>
 </head>
 <body>
-  <main>
-    <div class="tag"><span class="dot" aria-hidden="true"></span>Сайт опубликован</div>
-    <h1>Привет,<br>это <span>MyWebSite.</span></h1>
-    <p>Мой уголок в интернете. Здесь скоро появятся проекты, идеи и всё, чем захочется поделиться.</p>
-    <div class="note">Страница уже доступна всем по этой ссылке. Заглядывайте снова!</div>
-  </main>
+
+<div class="app-card" id="window">
+    <h1>Когнитивный Нейропаспорт</h1>
+    <p>Добро пожаловать в нейро-марафон! Ученику предстоит пройти 6 быстрых тестов, которые определят когнитивный профиль для изучения английского языка.</p>
+    <button class="btn" onclick="runStep('schulte_intro')">Запустить сканирование</button>
+</div>
+
+<script>
+    const finalScores = { schulte: 50, stroop: 50, corsi: 50, digit: 50, gonogo: 50, chrono: 50 };
+    const win = document.getElementById('window');
+
+    function runStep(step) {
+        if (step === 'schulte_intro') {
+            win.innerHTML = `<h1>Тест 1: Выносливость внимания</h1>
+                <p>Ищи числа от 1 до 25 строго по порядку как можно быстрее!</p>
+                <button class="btn" onclick="runSchulte()">Старт</button>`;
+        }
+        else if (step === 'stroop_intro') {
+            win.innerHTML = `<h1>Тест 2: Переключение мышления</h1>
+                <p>Выбирай именно ЦВЕТ букв, а не то, что написано текстом! Будет 20 карточек.</p>
+                <button class="btn" onclick="runStroop()">Старт</button>`;
+        }
+        else if (step === 'corsi_intro') {
+            win.innerHTML = `<h1>Тест 3: Визуальная память</h1>
+                <p>Запомни порядок вспышек блоков и повтори его кликами. С каждым верным ходом длина цепочки растёт.</p>
+                <button class="btn" onclick="runCorsi()">Старт</button>`;
+        }
+        else if (step === 'digit_intro') {
+            win.innerHTML = `<h1>Тест 4: Аудио-ёмкость памяти</h1>
+                <p>Включите звук! Вы услышите цепочку цифр. Запомните её и введите задом наперёд.</p>
+                <button class="btn" onclick="runDigit()">Старт</button>`;
+        }
+        else if (step === 'gonogo_intro') {
+            win.innerHTML = `<h1>Тест 5: Точность и Самоконтроль</h1>
+                <p>Будет 20 раундов. Если круг ЗЕЛЁНЫЙ — жми "КЛИК". Если КРАСНЫЙ — ничего не делай. Задержка случайна!</p>
+                <button class="btn" onclick="runGoNoGo()">Старт</button>`;
+        }
+        else if (step === 'chrono_intro') {
+            win.innerHTML = `<h1>Тест 6: Био-эффективность</h1>
+                <p>Ответь на вопрос о режиме дня, чтобы определить пики продуктивности мозга.</p>
+                <div class="survey-options">
+                    <label class="survey-label"><input type="radio" name="chr" value="80"> Тяжело встаю по утрам, пик энергии ближе к вечеру</label>
+                    <label class="survey-label"><input type="radio" name="chr" value="95"> Легко встаю рано утром, продуктивен в первой половине дня</label>
+                    <label class="survey-label"><input type="radio" name="chr" value="70"> Моя активность распределена ровно в течение дня</label>
+                </div>
+                <button class="btn" onclick="endChrono()">Завершить</button>`;
+        }
+    }
+
+    // 1. Шульте
+    function runSchulte() {
+        let target = 1;
+        const start = Date.now();
+        win.innerHTML = `<h1>Тест Шульте</h1>
+            <div style="font-weight:bold;color:#38bdf8;margin-bottom:10px" id="s-t">Ищи: 1</div>
+            <div class="schulte-grid" id="s-g"></div>`;
+        const sGrid = document.getElementById('s-g');
+        const nums = Array.from({ length: 25 }, (_, i) => i + 1).sort(() => Math.random() - 0.5);
+        
+        nums.forEach(n => {
+            const c = document.createElement('div');
+            c.className = 'schulte-cell';
+            c.innerText = n;
+            c.onclick = () => {
+                if (n === target) {
+                    c.classList.add('done');
+                    target++;
+                    if (target > 25) {
+                        const sec = (Date.now() - start) / 1000;
+                        finalScores.schulte = Math.max(30, Math.min(100, Math.round(125 - (sec * 1.2))));
+                        runStep('stroop_intro');
+                    } else {
+                        document.getElementById('s-t').innerText = `Ищи: ${target}`;
+                    }
+                }
+            };
+            sGrid.appendChild(c);
+        });
+    }
+
+    // 2. Струп
+    function runStroop() {
+        const colors = [
+            { t: 'СИНИЙ',   c: '#ef4444', r: 'Красный' },
+            { t: 'КРАСНЫЙ', c: '#22c55e', r: 'Зеленый' },
+            { t: 'ЗЕЛЁНЫЙ', c: '#3b82f6', r: 'Синий'   },
+            { t: 'ЖЁЛТЫЙ',  c: '#eab308', r: 'Желтый'  },
+            { t: 'ФИОЛЕТОВЫЙ', c: '#22c55e', r: 'Зеленый' }
+        ];
+        
+        let q = [];
+        for(let i = 0; i < 20; i++) {
+            q.push(colors[Math.floor(Math.random() * colors.length)]);
+        }
+        
+        let idx = 0;
+        let err = 0;
+        let startTime = Date.now();
+
+        function showQ() {
+            if (idx >= q.length) {
+                const totalSec = (Date.now() - startTime) / 1000;
+                const timePenalty = Math.max(0, totalSec - 15) * 1.5;
+                finalScores.stroop = Math.max(10, Math.round(100 - (err * 7.5) - timePenalty));
+                runStep('corsi_intro');
+                return;
+            }
+            win.innerHTML = `<h1>Тест Струпа</h1><p>Жми цвет букв!</p>
+                <div class="stroop-word" style="color:${q[idx].c}">${q[idx].t}</div>
+                <div class="stroop-options">
+                    <button class="stroop-btn" onclick="checkS('Красный')">Красный</button>
+                    <button class="stroop-btn" onclick="checkS('Зеленый')">Зеленый</button>
+                    <button class="stroop-btn" onclick="checkS('Синий')">Синий</button>
+                    <button class="stroop-btn" onclick="checkS('Желтый')">Желтый</button>
+                </div>`;
+        }
+
+        window.checkS = (color) => {
+            if (color !== q[idx].r) err++;
+            idx++;
+            showQ();
+        };
+        showQ();
+    }
+
+    // 3. Корси
+    function runCorsi() {
+        win.innerHTML = `<h1>Тест Корси</h1><p>Запомни порядок вспышек!</p>
+            <div class="corsi-grid" id="c-g"></div>`;
+        const g = document.getElementById('c-g');
+        for (let i = 0; i < 9; i++) {
+            const b = document.createElement('div');
+            b.className = 'corsi-block';
+            b.dataset.id = i;
+            g.appendChild(b);
+        }
+        const blocks = Array.from(g.children);
+        
+        let currentLength = 3; 
+        let maxPassedLength = 2;
+
+        function startRound() {
+            const path = [];
+            while (path.length < currentLength) {
+                const r = Math.floor(Math.random() * 9);
+                if (!path.includes(r)) path.push(r);
+            }
+            
+            blocks.forEach(x => { 
+                x.onclick = null; 
+                x.style.background = '#475569'; 
+                x.className = 'corsi-block';
+            });
+            
+            let flashIndex = 0;
+            function flash() {
+                if (flashIndex >= path.length) { userTurn(path); return; }
+                const el = blocks[path[flashIndex]];
+                el.style.background = '#38bdf8';
+                setTimeout(() => {
+                    el.style.background = '#475569';
+                    flashIndex++;
+                    setTimeout(flash, 200);
+                }, 500);
+            }
+            setTimeout(flash, 400);
+        }
+
+        function userTurn(path) {
+            let step = 0;
+            blocks.forEach(b => {
+                b.onclick = () => {
+                    if (parseInt(b.dataset.id, 10) === path[step]) {
+                        b.classList.add('user-correct');
+                        setTimeout(() => b.classList.remove('user-correct'), 300);
+                        
+                        step++;
+                        if (step >= path.length) {
+                            blocks.forEach(x => x.onclick = null);
+                            maxPassedLength = currentLength;
+                            currentLength++;
+                            if(currentLength > 8) { 
+                                finalScores.corsi = 100;
+                                runStep('digit_intro');
+                            } else {
+                                startRound();
+                            }
+                        }
+                    } else {
+                        b.classList.add('user-wrong');
+                        blocks.forEach(x => x.onclick = null);
+                        
+                        setTimeout(() => {
+                            b.classList.remove('user-wrong');
+                            finalScores.corsi = Math.min(100, Math.max(10, (maxPassedLength * 12)));
+                            runStep('digit_intro');
+                        }, 600);
+                    }
+                };
+            });
+        }
+        startRound();
+    }
+
+    // 4. Digit Span
+    function runDigit() {
+        let currentLength = 3;
+        let maxPassedLength = 2;
+
+        function startRound() {
+            const series = [];
+            for(let i=0; i<currentLength; i++) series.push(Math.floor(Math.random() * 9) + 1);
+            const seriesStr = series.join(' ');
+            
+            win.innerHTML = `<h1>Тест Digit Span</h1><p>Слушай и запоминай (цифр: ${currentLength})...</p>
+                <div class="digit-display" id="d-spk">🎧 Воспроизведение...</div>`;
+            
+            const msg = new SpeechSynthesisUtterance(seriesStr);
+            msg.lang = 'ru-RU';
+            msg.rate = 0.85; 
+            
+            msg.onend = () => {
+                setTimeout(() => {
+                    win.innerHTML = `<h1>Введи наоборот</h1>
+                        <p>Введи цифры в обратном порядке:</p>
+                        <input type="text" id="d-in" class="digit-input" placeholder="Цифры сюда"><br>
+                        <button class="btn" onclick="checkDigit('${seriesStr.replace(/ /g, '')}')">Проверить</button>`;
+                    document.getElementById('d-in').focus();
+                }, 500);
+            };
+            window.speechSynthesis.speak(msg);
+        }
+
+        window.checkDigit = (expectedReverse) => {
+            const val = document.getElementById('d-in').value.replace(/\s/g, '');
+            if (val === expectedReverse) {
+                maxPassedLength = currentLength;
+                currentLength++;
+                if(currentLength > 8) {
+                    finalScores.digit = 100;
+                    runStep('gonogo_intro');
+                } else {
+                    startRound();
+                }
+            } else {
+                finalScores.digit = Math.min(100, Math.max(10, (maxPassedLength * 12)));
+                runStep('gonogo_intro');
+            }
+        };
+        startRound();
+    }
+
+    // 5. Go/No-Go
+    function runGoNoGo() {
+        win.innerHTML = `<h1>Тест Go/No-Go</h1>
+            <div class="gonogo-zone"><div class="gonogo-circle" id="g-c"></div></div>
+            <button class="btn" id="g-b" disabled onclick="hitGo()">КЛИК!</button>`;
+        const circle = document.getElementById('g-c');
+        const btn = document.getElementById('g-b');
+
+        const rounds = [];
+        for(let i=0; i<20; i++) {
+            rounds.push(Math.random() > 0.35 ? 'green' : 'red'); 
+        }
+        const greenTotal = rounds.filter(r => r === 'green').length;
+        
+        let curr = 0;
+        let hits = 0;
+        let errors = 0;
+
+        window.hitGo = () => {
+            if (rounds[curr] === 'green') hits++;
+            else errors++;
+            btn.disabled = true; 
+        };
+
+        function showRound() {
+            if (curr >= rounds.length) {
+                const raw = (hits - (errors * 1.5)) / greenTotal; 
+                finalScores.gonogo = Math.max(0, Math.min(100, Math.round(raw * 100)));
+                runStep('chrono_intro');
+                return;
+            }
+            const isGreen = rounds[curr] === 'green';
+            circle.style.background = isGreen ? '#22c55e' : '#ef4444';
+            circle.style.color = isGreen ? '#22c55e' : '#ef4444';
+            circle.style.display = 'block';
+            btn.disabled = false;
+
+            const randomDelay = Math.floor(Math.random() * 1300) + 500;
+            
+            setTimeout(() => {
+                circle.style.display = 'none';
+                btn.disabled = true;
+                curr++;
+                setTimeout(showRound, 400 + Math.random() * 400);
+            }, randomDelay);
+        }
+        setTimeout(showRound, 1000);
+    }
+
+    // 6. Хронотип
+    window.endChrono = () => {
+        const checked = document.querySelector('input[name="chr"]:checked');
+        finalScores.chrono = checked ? parseInt(checked.value, 10) : 75;
+        win.innerHTML = `<h1>Идёт обработка данных...</h1>
+            <div class="scan-animation"></div>
+            <p>Сканируем нейронные связи и генерируем Нейропаспорт</p>`;
+        setTimeout(renderNeuroPassport, 2000);
+    };
+
+    function renderNeuroPassport() {
+        win.innerHTML = `
+            <div class="final-layout">
+                <h1>АНАЛИЗ ЗАВЕРШЁН</h1>
+                <div class="arrow-down">⬇️</div>
+                
+                <div class="chart-wrapper">
+                    <!-- Картинка мозга (берется из папки) -->
+                    <img src="brain.png" class="brain-bg" alt="" onerror="this.style.display='none'">
+                    <canvas id="neuroChart"></canvas>
+                </div>
+                
+                <div class="chart-tabs" id="tabs">
+                    <div class="chart-tab" onclick="showTip(0)">Переключение</div>
+                    <div class="chart-tab" onclick="showTip(1)">Выносливость</div>
+                    <div class="chart-tab" onclick="showTip(2)">Визуал-Память</div>
+                    <div class="chart-tab" onclick="showTip(3)">Аудио-ёмкость</div>
+                    <div class="chart-tab" onclick="showTip(4)">Точность</div>
+                    <div class="chart-tab" onclick="showTip(5)">Био-ритм</div>
+                </div>
+
+                <div class="tips-box" id="tips"></div>
+                
+                <!-- Блок научного анализа -->
+                <div class="science-report" id="science-report">
+                    <!-- Генерируется скриптом -->
+                </div>
+
+                <button class="btn" onclick="location.reload()">Пройти марафон заново</button>
+            </div>`;
+
+        const ctx = document.getElementById('neuroChart').getContext('2d');
+        new Chart(ctx, {
+            type: 'radar',
+            data: {
+                labels: ['Переключение', 'Выносливость', 'Визуал-Память', 'Аудио-ёмкость', 'Точность', 'Био-ритм'],
+                datasets: [{
+                    label: 'Профиль (%)',
+                    data: [
+                        finalScores.stroop,
+                        finalScores.schulte,
+                        finalScores.corsi,
+                        finalScores.digit,
+                        finalScores.gonogo,
+                        finalScores.chrono
+                    ],
+                    backgroundColor: 'rgba(56, 189, 248, 0.2)',
+                    borderColor: '#38bdf8',
+                    borderWidth: 3,
+                    pointBackgroundColor: '#38bdf8',
+                    pointBorderColor: '#0f172a',
+                    pointRadius: 5,
+                    pointHoverRadius: 8
+                }]
+            },
+            options: {
+                animation: { duration: 1500, easing: 'easeOutQuart' },
+                animations: { r: { animateScale: true, animateRotate: true } },
+                scales: {
+                    r: {
+                        angleLines: { color: '#334155' },
+                        grid: { color: '#334155' },
+                        pointLabels: { color: '#94a3b8', font: { size: 11, weight: 'bold' } },
+                        ticks: { display: false, stepSize: 25 },
+                        min: 0, max: 100
+                    }
+                },
+                plugins: { legend: { display: false } }
+            }
+        });
+        
+        showTip(0);
+        generateDeepAnalysis();
+    }
+
+    const tipsList = [
+        "⚡ Переключение: Барьер родной речи. Высокий балл — ученик думает сразу на английском. Низкий — нужен метод погружения через картинки и ассоциации, без перевода.",
+        "🔋 Выносливость: Энергетический лимит. Если балл низкий, через 20 минут урока темп падает. Срочно переключайте вид деятельности (игра/видео) и делайте нейро-разминки.",
+        "📸 Визуальная память: Запоминание облика слов. Низкий балл — используйте цветные маркеры, карточки-мнемотехники и разделение фраз на мелкие паттерны.",
+        "🎧 Аудио-ёмкость: Понимание на слух. При слабом результате ученик забывает начало длинной фразы. Работайте короткими треками по 10–15 секунд с визуальной опорой.",
+        "🎯 Точность: Борьба с глупыми ошибками. Низкий балл — ученик знает правила, но косячит из-за импульсивности. Нужен строгий чек-лист самопроверки.",
+        "⏰ Био-ритм: Эффективные часы. Не ставьте уроки в противофазе хронотипа. Дайте рекомендации учить слова в часы пиковой активности (когда энергия на пике)."
+    ];
+
+    window.showTip = (idx) => {
+        document.getElementById('tips').innerText = tipsList[idx];
+        document.querySelectorAll('.chart-tab').forEach((tab, i) => {
+            tab.classList.toggle('active', i === idx);
+        });
+    };
+
+    // ФУНКЦИЯ ГЛУБОКОГО АНАЛИЗА
+    function generateDeepAnalysis() {
+        const scores = [
+            { name: 'Переключение', val: finalScores.stroop },
+            { name: 'Выносливость', val: finalScores.schulte },
+            { name: 'Визуальная память', val: finalScores.corsi },
+            { name: 'Аудио-ёмкость', val: finalScores.digit },
+            { name: 'Точность', val: finalScores.gonogo },
+            { name: 'Био-ритм', val: finalScores.chrono }
+        ];
+
+        // Сортируем по возрастанию, чтобы найти слабые места
+        const sorted = [...scores].sort((a, b) => a.val - b.val);
+        
+        const weakest = sorted[0];
+        const strongest = sorted[sorted.length - 1];
+        const averageScore = Math.round(scores.reduce((acc, curr) => acc + curr.val, 0) / scores.length);
+
+        let reportHTML = `<h3>📊 Научный анализ профиля</h3>`;
+        reportHTML += `<div class="report-stat">Общий индекс когнитивной готовности: <span>${averageScore}%</span></div>`;
+        
+        // Определяем тип ученика
+        let type = "";
+        if (finalScores.digit > 80 && finalScores.corsi > 80) type = "Универсал (легко усваивает и на слух, и глазами)";
+        else if (finalScores.digit > finalScores.corsi) type = "Аудиал (лучше воспринимает на слух)";
+        else if (finalScores.corsi > finalScores.digit) type = "Визуал (лучше воспринимает глазами)";
+        else type = "Смешанный тип (требуется постоянная смена деятельности)";
+        
+        reportHTML += `<div class="report-stat">Ведущий канал восприятия: <span>${type}</span></div>`;
+
+        // Блок сильных сторон
+        reportHTML += `<div class="report-block strong">
+            <strong>✅ Сильная зона: ${strongest.name} (${strongest.val}%)</strong>
+            Это ваш главный ресурс на уроках. Опирайтесь на эту способность при вводе нового материала. Если это визуал — давайте больше текста и схем, если аудиал — больше слушания и повторения вслух.
+        </div>`;
+
+        // Блок слабых сторон с рекомендациями
+        reportHTML += `<div class="report-block weak">
+            <strong>⚠️ Зона роста: ${weakest.name} (${weakest.val}%)</strong>`;
+        
+        if (weakest.name === 'Выносливость') {
+            reportHTML += `Ученик быстро теряет концентрацию. <b>Как улучшить:</b> Дробите урок на отрезки по 15 минут. Меняйте активность каждые 10 минут (чтение -> игра -> видео). Не давайте длинных текстов, лучше короткие предложения с картинками.`;
+        } else if (weakest.name === 'Переключение') {
+            reportHTML += `Ученик тратит много сил на перевод с русского на английский. <b>Как улучшить:</b> Введите запрет на перевод (No Russian). Отрабатывайте лексику через ассоциации и жесты (TPR). Используйте игры на скорость (Alias, Dobble).`;
+        } else if (weakest.name === 'Визуальная память') {
+            reportHTML += `Ученик забывает, как выглядят слова. <b>Как улучшить:</b> Забудьте про списки слов! Рисуйте слова, используйте всплывающие карточки (Anki) с картинками, пишите слова на стикерах и развешивайте по комнате.`;
+        } else if (weakest.name === 'Аудио-ёмкость') {
+            reportHTML += `Ученик не удерживает длинные фразы на слух. <b>Как улучшить:</b> Не давайте длинных аудио! Слушайте треки по 10-15 секунд. Используйте субтитры. Отрабатывайте фонетику через скороговорки.`;
+        } else if (weakest.name === 'Точность') {
+            reportHTML += `Ученик делает глупые ошибки (знает, но путается). <b>Как улучшить:</b> Введите обязательный чек-лист проверки перед сдачей работы (Время? Окончания? Артикли?). Играйте в игры на внимание (поиск отличий, корректор ошибок).`;
+        } else if (weakest.name === 'Био-ритм') {
+            reportHTML += `Ученик не в ресурсе в определенное время. <b>Как улучшить:</b> Определите время, когда он "сова" или "жаворонок" (по результатам теста). Не ставьте сложную грамматику на время спада. В пик энергии давайте самое сложное.`;
+        } else {
+            reportHTML += `Рекомендуется перестроить процесс обучения, добавив больше интерактивных элементов и игры на внимание.`;
+        }
+        reportHTML += `</div>`;
+
+        // Добавляем общую рекомендацию
+        reportHTML += `<div class="report-stat" style="margin-top:15px; font-style:italic; color:#94a3b8; font-size:12px; border-top:1px solid #334155; padding-top:10px;">
+            *На основе данных профиля рекомендуется строить урок по принципу <b>«Трех каналов»</b>: 30% визуал (карточки/текст), 30% аудио (слушание/речь), 40% кинестетика (игры, движение), с акцентом на слабую зону.
+        </div>`;
+
+        document.getElementById('science-report').innerHTML = reportHTML;
+    }
+</script>
+
 </body>
 </html>
